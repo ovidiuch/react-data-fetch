@@ -9,11 +9,12 @@
 
 return {
   /**
-   * Bare functionality for fetching server-side JSON data inside a Component.
+   * Bare functionality for fetching server-side JSON data inside a React
+   * component.
    *
    * Props:
    *   - dataUrl: A URL to fetch data from. Once data is received it will be
-   *              set inside the Component's state, under the data key, and
+   *              set inside the component's state, under the data key, and
    *              will cause a reactive re-render.
    *   - pollInterval: An interval in milliseconds for polling the data URL.
    *                   Defaults to 0, which means no polling.
@@ -42,7 +43,7 @@ return {
 
   componentWillReceiveProps: function(nextProps) {
     /**
-     * A Component can have its configuration replaced at any time so we need
+     * A component can have its configuration replaced at any time so we need
      * to fetch data again.
      *
      * Only fetch data if the dataUrl has changed.
