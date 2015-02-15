@@ -1,0 +1,23 @@
+{
+  "name": "react-data-fetch",
+  "version": "0.1.0",
+  "description": "A good-enough data fetching mixin for React components",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skidding/react-data-fetch.git"
+  },
+  "dependencies": {
+    "jquery": "~1.11.1",
+    "lodash": "~2.4.1"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.1.0",
+    "sinon": "^1.12.2",
+    "sinon-chai": "^2.6.0"
+  },
+  "main": "src/data-fetch-mixin.js",
+  "scripts": {
+    "test": "mocha tests/data-fetch-mixin.js"
+  }
+}
