@@ -97,7 +97,7 @@ return {
      *     returns the data URL. The expected method name is "getDataUrl" and
      *     overrides the dataUrl prop when implemented
      */
-    var dataUrl = typeof(this.getDataUrl) == 'function' ?
+    var dataUrl = typeof(this.getDataUrl) === 'function' ?
                   this.getDataUrl(props) :
                   props.dataUrl;
 
@@ -146,7 +146,7 @@ return {
     onError = function(xhr, status, err) {
       if (this._ignoreXhrRequestCallbacks) {
         return;
-      };
+      }
 
       this.setState({
         isFetchingData: false
