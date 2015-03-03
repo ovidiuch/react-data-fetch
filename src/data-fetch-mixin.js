@@ -150,7 +150,13 @@ return {
       }
 
       this.setState({
-        isFetchingData: false
+        isFetchingData: false,
+        dataError: {
+          url: url,
+          statusCode: xhr.status,
+          statusText: status,
+          message: err.toString()
+        }
       });
 
       console.error(url, status, err.toString());
