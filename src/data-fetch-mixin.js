@@ -35,7 +35,8 @@ return {
 
   getInitialState: function() {
     return {
-      isFetchingData: false
+      isFetchingData: false,
+      dataError: null
     };
   },
 
