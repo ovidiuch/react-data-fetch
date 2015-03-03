@@ -180,7 +180,7 @@ describe("DataFetch mixin", function() {
     fakeComponent.componentWillMount();
 
     var onError = $.ajax.args[0][0].error;
-    onError(null, 503, 'foobar');
+    onError({}, 503, 'foobar');
 
     var setStateArgs = fakeComponent.setState.lastCall.args[0];
     expect(setStateArgs.isFetchingData).to.equal(false);
@@ -197,7 +197,7 @@ describe("DataFetch mixin", function() {
     var prevCallCount = fakeComponent.setState.callCount;
 
     var onError = $.ajax.args[0][0].error;
-    onError(null, 503, 'foobar');
+    onError({}, 503, 'foobar');
 
     expect(fakeComponent.setState.callCount).to.equal(prevCallCount);
   })
