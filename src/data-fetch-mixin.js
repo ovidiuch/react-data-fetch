@@ -33,6 +33,12 @@ return {
     };
   },
 
+  getInitialState: function() {
+    return {
+      isFetchingData: false
+    }
+  },
+
   componentWillMount: function() {
     this._xhrRequests = [];
 
