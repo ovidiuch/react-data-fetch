@@ -200,5 +200,39 @@ describe("DataFetch mixin", function() {
     onError({}, 503, 'foobar');
 
     expect(fakeComponent.setState.callCount).to.equal(prevCallCount);
-  })
+  });
+
+  it("should set isFetchingData to false in initial state", function() {
+    var initialState = fakeComponent.getInitialState();
+
+    expect(initialState.isFetchingData).to.equal(false);
+  });
+
+  it("should set dataError for a failed request", function() {
+    fakeComponent.props.dataUrl = 'foo';
+
+    fakeComponent.componentWillMount();
+
+    var onError = $.ajax.args[0][0].error;
+    onError({}, 404, 'foo');
+
+    var setStateArgs = fakeComponent.setState.lastCall.args[0];
+    expect(setStateArgs.dataError.statusText).to.equal(404);
+  });
+
+  it("should reset dataError before a new request", function() {
+    fakeComponent.props.dataUrl = 'foo';
+
+    fakeComponent.componentWillMount();
+
+    // force an error
+    var onError = $.ajax.args[0][0].error;
+    onError({}, 404, 'foo');
+
+    // force a new request that triggers the reset
+    fakeComponent.componentWillMount();
+
+    var setStateArgs = fakeComponent.setState.lastCall.args[0];
+    expect(setStateArgs.dataError).to.equal(null);
+  });
 });
