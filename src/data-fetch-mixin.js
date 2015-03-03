@@ -132,7 +132,8 @@ return {
 
   _fetchDataFromServer: function(url, onSuccess) {
     this.setState({
-      isFetchingData: true
+      isFetchingData: true,
+      dataError: null
     });
 
     var request,
