@@ -208,6 +208,12 @@ describe("DataFetch mixin", function() {
     expect(initialState.isFetchingData).to.equal(false);
   });
 
+  it("should set dataError to null in initial state", function() {
+    var initialState = fakeComponent.getInitialState();
+
+    expect(initialState.dataError).to.equal(null);
+  });
+
   it("should set dataError for a failed request", function() {
     fakeComponent.props.dataUrl = 'foo';
 
