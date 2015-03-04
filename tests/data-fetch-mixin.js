@@ -214,31 +214,74 @@ describe("DataFetch mixin", function() {
     expect(initialState.dataError).to.equal(null);
   });
 
-  it("should set dataError for a failed request", function() {
-    fakeComponent.props.dataUrl = 'foo';
+  describe("dataError set in this.state for failed requests", function() {
+    var url = 'www.foo.bar',
+        setStateArgs,
+        err = {toString: sinon.stub()},
+        xhrObj = {
+          status: 404,
+          statusText: 'Not found'
+        };
 
-    fakeComponent.componentWillMount();
+    beforeEach(function() {
+      fakeComponent.props.dataUrl = url;
 
-    var onError = $.ajax.args[0][0].error;
-    onError({}, 404, 'foo');
+      fakeComponent.componentWillMount();
 
-    var setStateArgs = fakeComponent.setState.lastCall.args[0];
-    expect(setStateArgs.dataError.statusText).to.equal(404);
+      var onError = $.ajax.args[0][0].error;
+      onError(xhrObj, xhrObj.status, err);
+
+      setStateArgs = fakeComponent.setState.lastCall.args[0];
+    });
+
+    afterEach(function() {
+      err.toString.reset();
+    });
+
+    it("should save the url of a failed request", function() {
+      expect(setStateArgs.dataError.url).to.equal(url);
+    });
+
+    it("should save the statusCode of a failed request", function() {
+      expect(setStateArgs.dataError.statusCode).to.equal(xhrObj.status);
+    });
+
+    it("should save the statusText of a failed request", function() {
+      expect(setStateArgs.dataError.statusText).to.equal(xhrObj.status);
+    });
+
+    it("should save the message of a failed request", function() {
+      expect(err.toString.callCount).to.equal(1);
+    });
   });
 
-  it("should reset dataError before a new request", function() {
-    fakeComponent.props.dataUrl = 'foo';
+  describe("dataError should reset", function() {
+    beforeEach(function() {
+      fakeComponent.props.dataUrl = 'foo';
 
-    fakeComponent.componentWillMount();
+      fakeComponent.componentWillMount();
 
-    // force an error
-    var onError = $.ajax.args[0][0].error;
-    onError({}, 404, 'foo');
+      var onError = $.ajax.args[0][0].error;
+      ajaxStub.abort = function(){};
+      onError({}, 404, 'foobar');
+    });
 
-    // force a new request that triggers the reset
-    fakeComponent.componentWillMount();
+    it("should reset dataError when refreshing data", function() {
+      fakeComponent.refreshData();
 
-    var setStateArgs = fakeComponent.setState.lastCall.args[0];
-    expect(setStateArgs.dataError).to.equal(null);
+      var setStateArgs = fakeComponent.setState.lastCall.args[0];
+
+      expect(setStateArgs.dataError).to.equal(null);
+    });
+
+    it("should reset dataError when receiving new dataUrl", function() {
+      fakeComponent.componentWillReceiveProps({
+        dataUrl: 'bar'
+      });
+
+      var setStateArgs = fakeComponent.setState.lastCall.args[0];
+
+      expect(setStateArgs.dataError).to.equal(null);
+    });
   });
 });
