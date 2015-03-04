@@ -159,8 +159,6 @@ return {
           message: err.toString()
         }
       });
-
-      console.error(url, status, err.toString());
     };
 
     request = $.ajax({
