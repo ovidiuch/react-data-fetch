@@ -33,6 +33,13 @@ return {
     };
   },
 
+  getInitialState: function() {
+    return {
+      isFetchingData: false,
+      dataError: null
+    };
+  },
+
   componentWillMount: function() {
     this._xhrRequests = [];
 
@@ -91,7 +98,7 @@ return {
      *     returns the data URL. The expected method name is "getDataUrl" and
      *     overrides the dataUrl prop when implemented
      */
-    var dataUrl = typeof(this.getDataUrl) == 'function' ?
+    var dataUrl = typeof(this.getDataUrl) === 'function' ?
                   this.getDataUrl(props) :
                   props.dataUrl;
 
@@ -126,7 +133,8 @@ return {
 
   _fetchDataFromServer: function(url, onSuccess) {
     this.setState({
-      isFetchingData: true
+      isFetchingData: true,
+      dataError: null
     });
 
     var request,
@@ -140,13 +148,17 @@ return {
     onError = function(xhr, status, err) {
       if (this._ignoreXhrRequestCallbacks) {
         return;
-      };
+      }
 
       this.setState({
-        isFetchingData: false
+        isFetchingData: false,
+        dataError: {
+          url: url,
+          statusCode: xhr.status,
+          statusText: status,
+          message: err.toString()
+        }
       });
-
-      console.error(url, status, err.toString());
     };
 
     request = $.ajax({

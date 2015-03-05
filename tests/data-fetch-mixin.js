@@ -180,7 +180,7 @@ describe("DataFetch mixin", function() {
     fakeComponent.componentWillMount();
 
     var onError = $.ajax.args[0][0].error;
-    onError(null, 503, 'foobar');
+    onError({}, 503, 'foobar');
 
     var setStateArgs = fakeComponent.setState.lastCall.args[0];
     expect(setStateArgs.isFetchingData).to.equal(false);
@@ -197,8 +197,91 @@ describe("DataFetch mixin", function() {
     var prevCallCount = fakeComponent.setState.callCount;
 
     var onError = $.ajax.args[0][0].error;
-    onError(null, 503, 'foobar');
+    onError({}, 503, 'foobar');
 
     expect(fakeComponent.setState.callCount).to.equal(prevCallCount);
-  })
+  });
+
+  it("should set isFetchingData to false in initial state", function() {
+    var initialState = fakeComponent.getInitialState();
+
+    expect(initialState.isFetchingData).to.equal(false);
+  });
+
+  it("should set dataError to null in initial state", function() {
+    var initialState = fakeComponent.getInitialState();
+
+    expect(initialState.dataError).to.equal(null);
+  });
+
+  describe("dataError set in this.state for failed requests", function() {
+    var url = 'www.foo.bar',
+        setStateArgs,
+        err = {toString: sinon.stub()},
+        xhrObj = {
+          status: 404,
+          statusText: 'Not found'
+        };
+
+    beforeEach(function() {
+      fakeComponent.props.dataUrl = url;
+
+      fakeComponent.componentWillMount();
+
+      var onError = $.ajax.args[0][0].error;
+      onError(xhrObj, xhrObj.status, err);
+
+      setStateArgs = fakeComponent.setState.lastCall.args[0];
+    });
+
+    afterEach(function() {
+      err.toString.reset();
+    });
+
+    it("should save the url of a failed request", function() {
+      expect(setStateArgs.dataError.url).to.equal(url);
+    });
+
+    it("should save the statusCode of a failed request", function() {
+      expect(setStateArgs.dataError.statusCode).to.equal(xhrObj.status);
+    });
+
+    it("should save the statusText of a failed request", function() {
+      expect(setStateArgs.dataError.statusText).to.equal(xhrObj.status);
+    });
+
+    it("should save the message of a failed request", function() {
+      expect(err.toString.callCount).to.equal(1);
+    });
+  });
+
+  describe("dataError should reset", function() {
+    beforeEach(function() {
+      fakeComponent.props.dataUrl = 'foo';
+
+      fakeComponent.componentWillMount();
+
+      var onError = $.ajax.args[0][0].error;
+      ajaxStub.abort = function(){};
+      onError({}, 404, 'foobar');
+    });
+
+    it("should reset dataError when refreshing data", function() {
+      fakeComponent.refreshData();
+
+      var setStateArgs = fakeComponent.setState.lastCall.args[0];
+
+      expect(setStateArgs.dataError).to.equal(null);
+    });
+
+    it("should reset dataError when receiving new dataUrl", function() {
+      fakeComponent.componentWillReceiveProps({
+        dataUrl: 'bar'
+      });
+
+      var setStateArgs = fakeComponent.setState.lastCall.args[0];
+
+      expect(setStateArgs.dataError).to.equal(null);
+    });
+  });
 });
