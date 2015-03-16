@@ -77,6 +77,10 @@ return {
     this._resetData(this.props);
   },
 
+  stopFetching: function() {
+    this._clearDataRequests();
+  },
+
   receiveDataFromServer: function(data) {
     this.setState({
       isFetchingData: false,
