@@ -77,6 +77,10 @@ return {
     this._resetData(this.props);
   },
 
+  stopFetching: function() {
+    this._clearDataRequests();
+  },
+
   receiveDataFromServer: function(data) {
     this.setState({
       isFetchingData: false,
@@ -128,6 +132,7 @@ return {
 
     if (this._pollInterval) {
       clearInterval(this._pollInterval);
+      this._pollInterval = null;
     }
   },
 

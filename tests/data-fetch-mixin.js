@@ -284,4 +284,31 @@ describe("DataFetch mixin", function() {
       expect(setStateArgs.dataError).to.equal(null);
     });
   });
+
+  describe("when stopping fetching", function() {
+    var nativeClearInterval = clearInterval;
+
+    beforeEach(function() {
+      clearInterval = sinon.spy();
+      ajaxStub.abort = sinon.spy();
+
+      fakeComponent.props.dataUrl = 'my-api.json';
+      fakeComponent.props.pollInterval = 5000;
+      fakeComponent.componentWillMount();
+
+      fakeComponent.stopFetching();
+    });
+
+    afterEach(function() {
+      clearInterval = nativeClearInterval;
+    })
+
+    it("should abort ajax call", function() {
+      expect(ajaxStub.abort).to.have.been.called;
+    });
+
+    it("should clear interval", function() {
+      expect(clearInterval).to.have.been.called;
+    });
+  });
 });
