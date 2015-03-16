@@ -128,6 +128,7 @@ return {
 
     if (this._pollInterval) {
       clearInterval(this._pollInterval);
+      this._pollInterval = null;
     }
   },
 
