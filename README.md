@@ -1,4 +1,4 @@
-# react-data-fetch [![Build Status](https://travis-ci.org/skidding/react-data-fetch.svg?branch=master)](https://travis-ci.org/skidding/react-data-fetch)
+# react-data-fetch [![Build Status](https://travis-ci.org/skidding/react-data-fetch.svg?branch=master)](https://travis-ci.org/skidding/react-data-fetch) [![Coverage Status](https://coveralls.io/repos/skidding/react-data-fetch/badge.svg?branch=master)](https://coveralls.io/r/skidding/react-data-fetch?branch=master)
 A good-enough data fetching mixin for React components. No models, no stores,
 just data.
 
