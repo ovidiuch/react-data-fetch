@@ -1,13 +1,7 @@
-// Works with Node and browser globals
-(function(root, factory) {
-  if (typeof exports === 'object') {
-    module.exports = factory(require('lodash'), require('jquery'));
-  } else {
-    root.DataFetchMixin = factory(root._, root.$);
-  }
-}(this, function(_, $) {
+var _ = require('lodash'),
+    $ = require('jquery');
 
-return {
+module.exports = {
   /**
    * Bare functionality for fetching server-side JSON data inside a React
    * component.
@@ -180,5 +174,3 @@ return {
     this._xhrRequests.push(request);
   }
 };
-
-}));
