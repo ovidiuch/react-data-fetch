@@ -18,6 +18,7 @@
   },
   "main": "src/data-fetch-mixin.js",
   "scripts": {
+    "pretest": "jscs ./",
     "test": "mocha tests/data-fetch-mixin.js"
   }
 }

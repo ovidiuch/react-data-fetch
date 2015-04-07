@@ -1,4 +1,4 @@
-describe("DataFetch mixin", function() {
+describe('DataFetch mixin', function() {
 
   var _ = require('lodash'),
       $ = require('jquery'),
@@ -27,7 +27,7 @@ describe("DataFetch mixin", function() {
     fakeComponent.props = {};
   });
 
-  it("should call $.ajax with dataUrl prop on mount", function() {
+  it('should call $.ajax with dataUrl prop on mount', function() {
     fakeComponent.props.dataUrl = 'my-api.json';
 
     fakeComponent.componentWillMount();
@@ -35,7 +35,7 @@ describe("DataFetch mixin", function() {
     expect($.ajax.args[0][0].url).to.equal('my-api.json');
   });
 
-  it("should not call $.ajax when dataUrl is equal", function() {
+  it('should not call $.ajax when dataUrl is equal', function() {
     fakeComponent.props.dataUrl = 'my-api.json';
     fakeComponent.componentWillMount();
 
@@ -46,8 +46,8 @@ describe("DataFetch mixin", function() {
     expect($.ajax.callCount).to.equal(1);
   });
 
-  it("should call $.ajax when dataUrl prop changes", function() {
-    ajaxStub.abort = function(){};
+  it('should call $.ajax when dataUrl prop changes', function() {
+    ajaxStub.abort = function() {};
 
     fakeComponent.props.dataUrl = 'my-api.json';
     fakeComponent.componentWillMount();
@@ -59,7 +59,7 @@ describe("DataFetch mixin", function() {
     expect($.ajax.lastCall.args[0].url).to.equal('my-api2.json');
   });
 
-  it("should abort first call when changing dataUrl", function() {
+  it('should abort first call when changing dataUrl', function() {
     ajaxStub.abort = sinon.spy();
 
     fakeComponent.props.dataUrl = 'my-api.json';
@@ -72,7 +72,7 @@ describe("DataFetch mixin", function() {
     expect(ajaxStub.abort).to.have.been.called;
   });
 
-  it("should call $.ajax with getDataUrl method if defined", function() {
+  it('should call $.ajax with getDataUrl method if defined', function() {
     fakeComponent.getDataUrl = sinon.stub().returns('my-custom-api.json');
 
     fakeComponent.componentWillMount();
@@ -81,7 +81,7 @@ describe("DataFetch mixin", function() {
     expect($.ajax.args[0][0].url).to.equal('my-custom-api.json');
   });
 
-  it("should call getDataUrl with props", function() {
+  it('should call getDataUrl with props', function() {
     fakeComponent.getDataUrl = sinon.spy();
     fakeComponent.props.someProp = true;
 
@@ -92,7 +92,7 @@ describe("DataFetch mixin", function() {
     });
   });
 
-  it("should call $.ajax with receiveDataFromServer callback", function() {
+  it('should call $.ajax with receiveDataFromServer callback', function() {
     fakeComponent.props.dataUrl = 'my-api.json';
     fakeComponent.componentWillMount();
 
@@ -100,7 +100,7 @@ describe("DataFetch mixin", function() {
           .to.equal(fakeComponent.receiveDataFromServer);
   });
 
-  it("should populate state.data with returned data", function() {
+  it('should populate state.data with returned data', function() {
     fakeComponent.receiveDataFromServer({
       name: 'John Doe',
       age: 42
@@ -111,8 +111,8 @@ describe("DataFetch mixin", function() {
     expect(setStateArgs.data.age).to.equal(42);
   });
 
-  it("should call $.ajax again when refreshData is called", function() {
-    ajaxStub.abort = function(){};
+  it('should call $.ajax again when refreshData is called', function() {
+    ajaxStub.abort = function() {};
 
     fakeComponent.props.dataUrl = 'my-api.json';
     fakeComponent.componentWillMount();
@@ -122,7 +122,7 @@ describe("DataFetch mixin", function() {
     expect($.ajax.lastCall.args[0].url).to.equal('my-api.json');
   });
 
-  describe("when pollInterval is set", function() {
+  describe('when pollInterval is set', function() {
 
     var _setInterval;
 
@@ -135,7 +135,7 @@ describe("DataFetch mixin", function() {
       setInterval = _setInterval;
     });
 
-    it("should call setInterval with correct delay", function() {
+    it('should call setInterval with correct delay', function() {
       fakeComponent.props.dataUrl = 'my-api.json';
       fakeComponent.props.pollInterval = 500;
 
@@ -145,7 +145,7 @@ describe("DataFetch mixin", function() {
       expect(setIntervalArgs[1]).to.equal(500);
     });
 
-    it("should call $.ajax again when triggering callback", function() {
+    it('should call $.ajax again when triggering callback', function() {
       fakeComponent.props.dataUrl = 'my-api.json';
       fakeComponent.props.pollInterval = 500;
 
@@ -158,7 +158,7 @@ describe("DataFetch mixin", function() {
     });
   });
 
-  it("should set isFetchingData true when mounting", function() {
+  it('should set isFetchingData true when mounting', function() {
     fakeComponent.props.dataUrl = 'my-api.json';
 
     fakeComponent.componentWillMount();
@@ -167,14 +167,14 @@ describe("DataFetch mixin", function() {
     expect(setStateArgs.isFetchingData).to.equal(true);
   });
 
-  it("should set isFetchingData false when receiving data", function() {
+  it('should set isFetchingData false when receiving data', function() {
     fakeComponent.receiveDataFromServer({});
 
     var setStateArgs = fakeComponent.setState.args[0][0];
     expect(setStateArgs.isFetchingData).to.equal(false);
   });
 
-  it("should set isFetchingData false if request errors", function() {
+  it('should set isFetchingData false if request errors', function() {
     fakeComponent.props.dataUrl = 'my-api.json';
 
     fakeComponent.componentWillMount();
@@ -186,8 +186,8 @@ describe("DataFetch mixin", function() {
     expect(setStateArgs.isFetchingData).to.equal(false);
   });
 
-  it("should not set state if request errors after unmount", function() {
-    ajaxStub.abort = function(){};
+  it('should not set state if request errors after unmount', function() {
+    ajaxStub.abort = function() {};
 
     fakeComponent.props.dataUrl = 'my-api.json';
 
@@ -202,19 +202,19 @@ describe("DataFetch mixin", function() {
     expect(fakeComponent.setState.callCount).to.equal(prevCallCount);
   });
 
-  it("should set isFetchingData to false in initial state", function() {
+  it('should set isFetchingData to false in initial state', function() {
     var initialState = fakeComponent.getInitialState();
 
     expect(initialState.isFetchingData).to.equal(false);
   });
 
-  it("should set dataError to null in initial state", function() {
+  it('should set dataError to null in initial state', function() {
     var initialState = fakeComponent.getInitialState();
 
     expect(initialState.dataError).to.equal(null);
   });
 
-  describe("dataError set in this.state for failed requests", function() {
+  describe('dataError set in this.state for failed requests', function() {
     var url = 'www.foo.bar',
         setStateArgs,
         err = {toString: sinon.stub()},
@@ -238,35 +238,35 @@ describe("DataFetch mixin", function() {
       err.toString.reset();
     });
 
-    it("should save the url of a failed request", function() {
+    it('should save the url of a failed request', function() {
       expect(setStateArgs.dataError.url).to.equal(url);
     });
 
-    it("should save the statusCode of a failed request", function() {
+    it('should save the statusCode of a failed request', function() {
       expect(setStateArgs.dataError.statusCode).to.equal(xhrObj.status);
     });
 
-    it("should save the statusText of a failed request", function() {
+    it('should save the statusText of a failed request', function() {
       expect(setStateArgs.dataError.statusText).to.equal(xhrObj.status);
     });
 
-    it("should save the message of a failed request", function() {
+    it('should save the message of a failed request', function() {
       expect(err.toString.callCount).to.equal(1);
     });
   });
 
-  describe("dataError should reset", function() {
+  describe('dataError should reset', function() {
     beforeEach(function() {
       fakeComponent.props.dataUrl = 'foo';
 
       fakeComponent.componentWillMount();
 
       var onError = $.ajax.args[0][0].error;
-      ajaxStub.abort = function(){};
+      ajaxStub.abort = function() {};
       onError({}, 404, 'foobar');
     });
 
-    it("should reset dataError when refreshing data", function() {
+    it('should reset dataError when refreshing data', function() {
       fakeComponent.refreshData();
 
       var setStateArgs = fakeComponent.setState.lastCall.args[0];
@@ -274,7 +274,7 @@ describe("DataFetch mixin", function() {
       expect(setStateArgs.dataError).to.equal(null);
     });
 
-    it("should reset dataError when receiving new dataUrl", function() {
+    it('should reset dataError when receiving new dataUrl', function() {
       fakeComponent.componentWillReceiveProps({
         dataUrl: 'bar'
       });
@@ -285,7 +285,7 @@ describe("DataFetch mixin", function() {
     });
   });
 
-  describe("when stopping fetching", function() {
+  describe('when stopping fetching', function() {
     var nativeClearInterval = clearInterval;
 
     beforeEach(function() {
@@ -303,11 +303,11 @@ describe("DataFetch mixin", function() {
       clearInterval = nativeClearInterval;
     })
 
-    it("should abort ajax call", function() {
+    it('should abort ajax call', function() {
       expect(ajaxStub.abort).to.have.been.called;
     });
 
-    it("should clear interval", function() {
+    it('should clear interval', function() {
       expect(clearInterval).to.have.been.called;
     });
   });
