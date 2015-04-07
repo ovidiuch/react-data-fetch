@@ -1,15 +1,8 @@
+var _ = require('lodash'),
+    $ = require('jquery'),
+    DataFetch = require('../src/data-fetch-mixin.js');
+
 describe('DataFetch mixin', function() {
-
-  var _ = require('lodash'),
-      $ = require('jquery'),
-      chai = require('chai'),
-      expect = chai.expect,
-      sinon = require('sinon'),
-      sinonChai = require('sinon-chai'),
-      DataFetch = require('../src/data-fetch-mixin.js');
-
-  chai.use(sinonChai);
-
   var ajaxStub,
       fakeComponent;
 
