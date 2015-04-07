@@ -33,6 +33,7 @@
   "main": "src/data-fetch-mixin.js",
   "scripts": {
     "pretest": "jscs ./",
-    "test": "karma start --single-run"
+    "test": "karma start --single-run",
+    "coveralls": "cat tests/coverage/*/lcov.info | node_modules/coveralls/bin/coveralls.js"
   }
 }
