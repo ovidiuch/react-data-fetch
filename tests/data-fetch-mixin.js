@@ -340,12 +340,13 @@ describe('DataFetch mixin', function() {
       });
 
       it('should poll the data URL', function() {
+        $.ajax.reset();
+
         var times = _.random(2, 5);
 
         clock.tick(fakeComponent.props.pollInterval * times);
 
-        // One for the initial request and one for each tick.
-        expect($.ajax.callCount).to.equal(1 + times);
+        expect($.ajax.callCount).to.equal(times);
       });
 
       describe('stopping', function() {
@@ -360,10 +361,33 @@ describe('DataFetch mixin', function() {
         });
 
         it('should clear the timer when told to stop polling', function() {
+          $.ajax.reset();
+
           clock.tick(fakeComponent.props.pollInterval);
 
-          // Only the initial request.
-          expect($.ajax.callCount).to.equal(1);
+          expect($.ajax).to.not.have.been.called;
+        });
+
+        describe('resuming', function() {
+          beforeEach(function() {
+            fakeComponent.resumePolling();
+          });
+
+          it('should mark polling as started when told to resume', function() {
+            expect(fakeComponent.setState).to.have.been.calledWith({
+              isPolling: true
+            });
+          });
+
+          it('should start the timer when resuming polling', function() {
+            $.ajax.reset();
+
+            var times = _.random(2, 5);
+
+            clock.tick(fakeComponent.props.pollInterval * times);
+
+            expect($.ajax.callCount).to.equal(times);
+          });
         });
       });
     });

@@ -85,6 +85,19 @@ module.exports = {
     });
   },
 
+  resumePolling: function() {
+    var callback = function() {
+      this._fetchDataFromServer(this.props.dataUrl, this.receiveDataFromServer);
+    };
+
+    this._pollInterval = setInterval(callback.bind(this),
+                                     this.props.pollInterval);
+
+    this.setState({
+      isPolling: true
+    });
+  },
+
   receiveDataFromServer: function(data) {
     this.setState({
       isFetchingData: false,
