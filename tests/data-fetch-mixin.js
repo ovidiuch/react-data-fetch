@@ -18,6 +18,7 @@ describe('DataFetch mixin', function() {
     // Mock React API
     fakeComponent.setState = sinon.spy();
     fakeComponent.props = {};
+    fakeComponent.state = {};
   });
 
   it('should call $.ajax with dataUrl prop on mount', function() {
@@ -302,6 +303,69 @@ describe('DataFetch mixin', function() {
 
     it('should clear interval', function() {
       expect(clearInterval).to.have.been.called;
+    });
+  });
+
+  describe('polling', function() {
+    var clock;
+
+    beforeEach(function() {
+      clock = sinon.useFakeTimers();
+
+      fakeComponent.props.dataUrl = 'my-api.json';
+    });
+
+    afterEach(function() {
+      clock.restore();
+    });
+
+    it('should be initially on if poll interval is set', function() {
+      fakeComponent.props.pollInterval = 1;
+
+      expect(fakeComponent.getInitialState().isPolling).to.be.true;
+    });
+
+    it('should be initially off if poll interval is not set', function() {
+      fakeComponent.props.pollInterval = 0;
+
+      expect(fakeComponent.getInitialState().isPolling).to.be.false;
+    });
+
+    describe('on', function() {
+      beforeEach(function() {
+        fakeComponent.props.pollInterval = _.random(1000, 5000);
+        fakeComponent.state.isPolling = true;
+
+        fakeComponent.componentWillMount();
+      });
+
+      it('should poll the data URL', function() {
+        var times = _.random(2, 5);
+
+        clock.tick(fakeComponent.props.pollInterval * times);
+
+        // One for the initial request and one for each tick.
+        expect($.ajax.callCount).to.equal(1 + times);
+      });
+
+      describe('stopping', function() {
+        beforeEach(function() {
+          fakeComponent.stopPolling();
+        });
+
+        it('should mark polling as stopped when told to stop', function() {
+          expect(fakeComponent.setState).to.have.been.calledWith({
+            isPolling: false
+          });
+        });
+
+        it('should clear the timer when told to stop polling', function() {
+          clock.tick(fakeComponent.props.pollInterval);
+
+          // Only the initial request.
+          expect($.ajax.callCount).to.equal(1);
+        });
+      });
     });
   });
 });

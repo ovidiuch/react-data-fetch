@@ -30,7 +30,8 @@ module.exports = {
   getInitialState: function() {
     return {
       isFetchingData: false,
-      dataError: null
+      dataError: null,
+      isPolling: this.props.pollInterval > 0
     };
   },
 
@@ -73,6 +74,15 @@ module.exports = {
 
   stopFetching: function() {
     this._clearDataRequests();
+  },
+
+  stopPolling: function() {
+    clearInterval(this._pollInterval);
+    this._pollInterval = null;
+
+    this.setState({
+      isPolling: false
+    });
   },
 
   receiveDataFromServer: function(data) {
