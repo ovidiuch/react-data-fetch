@@ -291,7 +291,7 @@ describe('DataFetch mixin', function() {
 
           clock.tick(fakeComponent.props.pollInterval * times);
 
-          expect($.ajax.callCount).to.equal(times);
+          expect($.ajax).to.have.callCount(times);
         });
 
         it('should poll the right URL', function() {
@@ -344,7 +344,7 @@ describe('DataFetch mixin', function() {
 
           clock.tick(newInterval * times);
 
-          expect($.ajax.callCount).to.equal(times);
+          expect($.ajax).to.have.callCount(times);
         });
 
         it('should stop polling when told to do so', function() {
@@ -366,7 +366,7 @@ describe('DataFetch mixin', function() {
 
           clock.tick(fakeComponent.props.pollInterval * times);
 
-          expect($.ajax.callCount).to.equal(times);
+          expect($.ajax).to.have.callCount(times);
         });
       });
 
@@ -398,7 +398,7 @@ describe('DataFetch mixin', function() {
 
           clock.tick(interval * times);
 
-          expect($.ajax.callCount).to.equal(times);
+          expect($.ajax).to.have.callCount(times);
         });
       });
     });
