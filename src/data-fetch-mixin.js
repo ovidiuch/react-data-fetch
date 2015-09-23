@@ -49,12 +49,18 @@ module.exports = {
   componentWillReceiveProps: function(nextProps) {
     /**
      * A component can have its configuration replaced at any time so we need
-     * to fetch data again.
-     *
-     * Only fetch data if the dataUrl has changed.
+     * to fetch data again. We may also need to resume/stop polling.
      */
     if (this.props.dataUrl !== nextProps.dataUrl) {
       this._resetData(nextProps);
+    }
+
+    if (this.props.pollInterval !== nextProps.pollInterval) {
+      if (this._shouldWePoll(nextProps)) {
+        this._startPolling(nextProps);
+      } else {
+        this._clearPolling();
+      }
     }
   },
 
@@ -100,8 +106,7 @@ module.exports = {
     /**
      * Hit the dataUrl and fetch data.
      *
-     * Before starting to fetch data we reset any ongoing requests. We also
-     * reset the polling interval.
+     * Before starting to fetch data we reset any ongoing requests.
      *
      * @param {Object} props
      * @param {String} props.dataUrl The URL that will be hit for data. The URL
@@ -133,7 +138,7 @@ module.exports = {
 
   _startPolling: function(props) {
     var callback = function() {
-      this._fetchDataFromServer(props.dataUurl, this.receiveDataFromServer);
+      this._fetchDataFromServer(props.dataUrl, this.receiveDataFromServer);
     };
 
     this._pollInterval = setInterval(callback.bind(this), props.pollInterval);

@@ -304,6 +304,20 @@ describe('DataFetch mixin', function() {
         expect($.ajax).to.not.have.been.called;
       });
 
+      it('should stop polling when receiving pollInterval=0', function() {
+        $.ajax.reset();
+
+        var times = _.random(2, 5),
+            oldInterval = fakeComponent.props.pollInterval;
+
+        fakeComponent.componentWillReceiveProps(
+            _.merge({}, fakeComponent.props, {pollInterval: 0}));
+
+        clock.tick(oldInterval * times);
+
+        expect($.ajax).to.not.have.been.called;
+      });
+
       it('should stop polling when told to do so', function() {
         $.ajax.reset();
 
@@ -342,6 +356,20 @@ describe('DataFetch mixin', function() {
         clock.tick(fakeComponent.props.pollInterval * times);
 
         expect($.ajax).to.not.have.been.called;
+      });
+
+      it('should start polling when receiving a poll interval', function() {
+        $.ajax.reset();
+
+        var times = _.random(2, 5),
+            interval = _.random(1000, 5000);
+
+        fakeComponent.componentWillReceiveProps(
+            _.merge({}, fakeComponent.props, {pollInterval: interval}));
+
+        clock.tick(interval * times);
+
+        expect($.ajax.callCount).to.equal(times);
       });
     });
   });
