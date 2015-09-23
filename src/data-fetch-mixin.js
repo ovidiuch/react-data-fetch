@@ -40,6 +40,10 @@ module.exports = {
     // The dataUrl prop points to a source of data than will extend the initial
     // state of the component, once it will be fetched
     this._resetData(this.props);
+
+    if (this._shouldWePoll(this.props)) {
+      this._startPolling(this.props);
+    }
   },
 
   componentWillReceiveProps: function(nextProps) {
