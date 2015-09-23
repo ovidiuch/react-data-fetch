@@ -7,7 +7,9 @@ describe('DataFetch mixin', function() {
       fakeComponent;
 
   beforeEach(function() {
-    ajaxStub = {};
+    ajaxStub = {
+      abort: function() {}
+    };
 
     // Mock jQuery forcefully, $.ajax is not even a function because jQuery
     // doesn't detect a DOM
@@ -114,42 +116,6 @@ describe('DataFetch mixin', function() {
     fakeComponent.refreshData();
 
     expect($.ajax.lastCall.args[0].url).to.equal('my-api.json');
-  });
-
-  describe('when pollInterval is set', function() {
-
-    var _setInterval;
-
-    beforeEach(function() {
-      _setInterval = setInterval;
-      setInterval = sinon.spy();
-    });
-
-    afterEach(function() {
-      setInterval = _setInterval;
-    });
-
-    it('should call setInterval with correct delay', function() {
-      fakeComponent.props.dataUrl = 'my-api.json';
-      fakeComponent.props.pollInterval = 500;
-
-      fakeComponent.componentWillMount();
-
-      var setIntervalArgs = setInterval.args[0];
-      expect(setIntervalArgs[1]).to.equal(500);
-    });
-
-    it('should call $.ajax again when triggering callback', function() {
-      fakeComponent.props.dataUrl = 'my-api.json';
-      fakeComponent.props.pollInterval = 500;
-
-      fakeComponent.componentWillMount();
-
-      var setIntervalCallback = setInterval.args[0][0];
-      setIntervalCallback();
-
-      expect($.ajax.callCount).to.equal(2);
-    });
   });
 
   it('should set isFetchingData true when mounting', function() {
@@ -283,26 +249,16 @@ describe('DataFetch mixin', function() {
     var nativeClearInterval = clearInterval;
 
     beforeEach(function() {
-      clearInterval = sinon.spy();
       ajaxStub.abort = sinon.spy();
 
       fakeComponent.props.dataUrl = 'my-api.json';
-      fakeComponent.props.pollInterval = 5000;
       fakeComponent.componentWillMount();
 
       fakeComponent.stopFetching();
     });
 
-    afterEach(function() {
-      clearInterval = nativeClearInterval;
-    })
-
     it('should abort ajax call', function() {
       expect(ajaxStub.abort).to.have.been.called;
-    });
-
-    it('should clear interval', function() {
-      expect(clearInterval).to.have.been.called;
     });
   });
 
@@ -319,19 +275,21 @@ describe('DataFetch mixin', function() {
       clock.restore();
     });
 
-    it('should be initially on if poll interval is set', function() {
+    it('should mark that we\'re polling when poll interval is given',
+       function() {
       fakeComponent.props.pollInterval = 1;
 
       expect(fakeComponent.getInitialState().isPolling).to.be.true;
     });
 
-    it('should be initially off if poll interval is not set', function() {
+    it('should mark that we\'re not polling when poll interval is not given',
+       function() {
       fakeComponent.props.pollInterval = 0;
 
       expect(fakeComponent.getInitialState().isPolling).to.be.false;
     });
 
-    describe('on', function() {
+    describe('when poll interval is given', function() {
       beforeEach(function() {
         fakeComponent.props.pollInterval = _.random(1000, 5000);
         fakeComponent.state.isPolling = true;
@@ -347,6 +305,18 @@ describe('DataFetch mixin', function() {
         clock.tick(fakeComponent.props.pollInterval * times);
 
         expect($.ajax.callCount).to.equal(times);
+      });
+
+      it('should stop polling when unmounting', function() {
+        $.ajax.reset();
+
+        fakeComponent.componentWillUnmount();
+
+        var times = _.random(2, 5);
+
+        clock.tick(fakeComponent.props.pollInterval * times);
+
+        expect($.ajax).to.not.have.been.called;
       });
 
       describe('stopping', function() {
@@ -389,6 +359,25 @@ describe('DataFetch mixin', function() {
             expect($.ajax.callCount).to.equal(times);
           });
         });
+      });
+    });
+
+    describe('when poll interval is not given', function() {
+      beforeEach(function() {
+        fakeComponent.props.pollInterval = 0;
+        fakeComponent.state.isPolling = false;
+
+        fakeComponent.componentWillMount();
+      });
+
+      it('should not poll the dataUrl', function() {
+        $.ajax.reset();
+
+        var times = _.random(2, 5);
+
+        clock.tick(fakeComponent.props.pollInterval * times);
+
+        expect($.ajax).to.not.have.been.called;
       });
     });
   });

@@ -31,7 +31,7 @@ module.exports = {
     return {
       isFetchingData: false,
       dataError: null,
-      isPolling: this.props.pollInterval > 0
+      isPolling: this._shouldWePoll(this.props)
     };
   },
 
@@ -63,6 +63,8 @@ module.exports = {
     this._ignoreXhrRequestCallbacks = true;
 
     this._clearDataRequests();
+
+    this._clearPolling();
   },
 
   refreshData: function() {
@@ -77,8 +79,7 @@ module.exports = {
   },
 
   stopPolling: function() {
-    clearInterval(this._pollInterval);
-    this._pollInterval = null;
+    this._clearPolling();
 
     this.setState({
       isPolling: false
@@ -86,16 +87,7 @@ module.exports = {
   },
 
   resumePolling: function() {
-    var callback = function() {
-      this._fetchDataFromServer(this.props.dataUrl, this.receiveDataFromServer);
-    };
-
-    this._pollInterval = setInterval(callback.bind(this),
-                                     this.props.pollInterval);
-
-    this.setState({
-      isPolling: true
-    });
+    this._startPolling(this.props);
   },
 
   receiveDataFromServer: function(data) {
@@ -119,38 +111,42 @@ module.exports = {
      *     returns the data URL. The expected method name is "getDataUrl" and
      *     overrides the dataUrl prop when implemented
      */
-    var dataUrl = typeof(this.getDataUrl) === 'function' ?
-                  this.getDataUrl(props) :
-                  props.dataUrl;
+    var dataUrl = this._getDataUrl(props);
 
-    // Clear any on-going polling when data is reset. Even if polling is still
-    // enabled, we need to reset the interval to start from now
     this._clearDataRequests();
 
     if (dataUrl) {
       this._fetchDataFromServer(dataUrl, this.receiveDataFromServer);
-
-      if (props.pollInterval) {
-        var callback = function() {
-          this._fetchDataFromServer(dataUrl, this.receiveDataFromServer);
-        };
-
-        this._pollInterval = setInterval(callback.bind(this),
-                                         props.pollInterval);
-      }
     }
   },
 
+  _getDataUrl: function(props) {
+    return typeof(this.getDataUrl) === 'function' ?
+        this.getDataUrl(props) : props.dataUrl;
+  },
+
   _clearDataRequests: function() {
-    // Cancel any on-going request and future polling
+    // Cancel any on-going request.
     while (!_.isEmpty(this._xhrRequests)) {
       this._xhrRequests.pop().abort();
     }
+  },
 
-    if (this._pollInterval) {
-      clearInterval(this._pollInterval);
-      this._pollInterval = null;
-    }
+  _startPolling: function(props) {
+    var callback = function() {
+      this._fetchDataFromServer(props.dataUurl, this.receiveDataFromServer);
+    };
+
+    this._pollInterval = setInterval(callback.bind(this), props.pollInterval);
+
+    this.setState({
+      isPolling: true
+    });
+  },
+
+  _clearPolling: function() {
+    clearInterval(this._pollInterval);
+    this._pollInterval = null;
   },
 
   _fetchDataFromServer: function(url, onSuccess) {
@@ -195,5 +191,9 @@ module.exports = {
     });
 
     this._xhrRequests.push(request);
+  },
+
+  _shouldWePoll: function(props) {
+    return props.pollInterval > 0;
   }
 };
