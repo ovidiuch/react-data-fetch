@@ -282,7 +282,7 @@ describe('DataFetch mixin', function() {
         fakeComponent.componentWillMount();
       });
 
-      it('should poll the data URL', function() {
+      it('should start polling after mounting', function() {
         $.ajax.reset();
 
         var times = _.random(2, 5);
@@ -304,34 +304,26 @@ describe('DataFetch mixin', function() {
         expect($.ajax).to.not.have.been.called;
       });
 
-      describe('stopping', function() {
-        beforeEach(function() {
-          fakeComponent.stopPolling();
-        });
+      it('should stop polling when told to do so', function() {
+        $.ajax.reset();
 
-        it('should clear the timer when told to stop polling', function() {
-          $.ajax.reset();
+        fakeComponent.stopPolling();
 
-          clock.tick(fakeComponent.props.pollInterval);
+        clock.tick(fakeComponent.props.pollInterval);
 
-          expect($.ajax).to.not.have.been.called;
-        });
+        expect($.ajax).to.not.have.been.called;
+      });
 
-        describe('resuming', function() {
-          beforeEach(function() {
-            fakeComponent.resumePolling();
-          });
+      it('should start polling when told to resume', function() {
+        $.ajax.reset();
+        fakeComponent.stopPolling();
+        fakeComponent.resumePolling();
 
-          it('should start the timer when resuming polling', function() {
-            $.ajax.reset();
+        var times = _.random(2, 5);
 
-            var times = _.random(2, 5);
+        clock.tick(fakeComponent.props.pollInterval * times);
 
-            clock.tick(fakeComponent.props.pollInterval * times);
-
-            expect($.ajax.callCount).to.equal(times);
-          });
-        });
+        expect($.ajax.callCount).to.equal(times);
       });
     });
 
@@ -342,7 +334,7 @@ describe('DataFetch mixin', function() {
         fakeComponent.componentWillMount();
       });
 
-      it('should not poll the dataUrl', function() {
+      it('should not start polling after mounting', function() {
         $.ajax.reset();
 
         var times = _.random(2, 5);
