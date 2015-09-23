@@ -124,11 +124,6 @@ module.exports = {
     }
   },
 
-  _getDataUrl: function(props) {
-    return typeof(this.getDataUrl) === 'function' ?
-        this.getDataUrl(props) : props.dataUrl;
-  },
-
   _clearDataRequests: function() {
     // Cancel any on-going request.
     while (!_.isEmpty(this._xhrRequests)) {
@@ -137,8 +132,10 @@ module.exports = {
   },
 
   _startPolling: function(props) {
+    var url = this._getDataUrl(props);
+
     var callback = function() {
-      this._fetchDataFromServer(props.dataUrl, this.receiveDataFromServer);
+      this._fetchDataFromServer(url, this.receiveDataFromServer);
     };
 
     this._pollInterval = setInterval(callback.bind(this), props.pollInterval);
@@ -147,6 +144,11 @@ module.exports = {
   _clearPolling: function() {
     clearInterval(this._pollInterval);
     this._pollInterval = null;
+  },
+
+  _getDataUrl: function(props) {
+    return typeof(this.getDataUrl) === 'function' ?
+        this.getDataUrl(props) : props.dataUrl;
   },
 
   _fetchDataFromServer: function(url, onSuccess) {

@@ -20,7 +20,6 @@ describe('DataFetch mixin', function() {
     // Mock React API
     fakeComponent.setState = sinon.spy();
     fakeComponent.props = {};
-    fakeComponent.state = {};
   });
 
   it('should call $.ajax with dataUrl prop on mount', function() {
@@ -267,109 +266,147 @@ describe('DataFetch mixin', function() {
 
     beforeEach(function() {
       clock = sinon.useFakeTimers();
-
-      fakeComponent.props.dataUrl = 'my-api.json';
     });
 
     afterEach(function() {
       clock.restore();
     });
 
-    describe('when poll interval is given', function() {
+    describe('wtih simple dataUrl', function() {
       beforeEach(function() {
+        fakeComponent.props.dataUrl = 'my-api.json';
+      });
+
+      describe('when poll interval is given', function() {
+        beforeEach(function() {
+          fakeComponent.props.pollInterval = _.random(1000, 5000);
+
+          fakeComponent.componentWillMount();
+        });
+
+        it('should start polling after mounting', function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5);
+
+          clock.tick(fakeComponent.props.pollInterval * times);
+
+          expect($.ajax.callCount).to.equal(times);
+        });
+
+        it('should poll the right URL', function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5);
+
+          clock.tick(fakeComponent.props.pollInterval * times);
+
+          expect($.ajax).to.have.always.been.calledWith(
+              sinon.match.has('url', fakeComponent.props.dataUrl));
+        });
+
+        it('should stop polling when unmounting', function() {
+          $.ajax.reset();
+
+          fakeComponent.componentWillUnmount();
+
+          var times = _.random(2, 5);
+
+          clock.tick(fakeComponent.props.pollInterval * times);
+
+          expect($.ajax).to.not.have.been.called;
+        });
+
+        it('should stop polling when receiving pollInterval=0', function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5),
+              oldInterval = fakeComponent.props.pollInterval;
+
+          fakeComponent.componentWillReceiveProps(
+              _.merge({}, fakeComponent.props, {pollInterval: 0}));
+
+          clock.tick(oldInterval * times);
+
+          expect($.ajax).to.not.have.been.called;
+        });
+
+        it('should stop polling when told to do so', function() {
+          $.ajax.reset();
+
+          fakeComponent.stopPolling();
+
+          clock.tick(fakeComponent.props.pollInterval);
+
+          expect($.ajax).to.not.have.been.called;
+        });
+
+        it('should start polling when told to resume', function() {
+          $.ajax.reset();
+          fakeComponent.stopPolling();
+          fakeComponent.resumePolling();
+
+          var times = _.random(2, 5);
+
+          clock.tick(fakeComponent.props.pollInterval * times);
+
+          expect($.ajax.callCount).to.equal(times);
+        });
+      });
+
+      describe('when poll interval is not given', function() {
+        beforeEach(function() {
+          fakeComponent.props.pollInterval = 0;
+
+          fakeComponent.componentWillMount();
+        });
+
+        it('should not start polling after mounting', function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5);
+
+          clock.tick(fakeComponent.props.pollInterval * times);
+
+          expect($.ajax).to.not.have.been.called;
+        });
+
+        it('should start polling when receiving a poll interval', function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5),
+              interval = _.random(1000, 5000);
+
+          fakeComponent.componentWillReceiveProps(
+              _.merge({}, fakeComponent.props, {pollInterval: interval}));
+
+          clock.tick(interval * times);
+
+          expect($.ajax.callCount).to.equal(times);
+        });
+      });
+    });
+
+    describe('with custom dataUrl', function() {
+      beforeEach(function() {
+        fakeComponent.getDataUrl = sinon.stub().returns('foobar.json');
         fakeComponent.props.pollInterval = _.random(1000, 5000);
 
         fakeComponent.componentWillMount();
       });
 
-      it('should start polling after mounting', function() {
+      it('should poll the right URL', function() {
         $.ajax.reset();
 
         var times = _.random(2, 5);
 
         clock.tick(fakeComponent.props.pollInterval * times);
 
-        expect($.ajax.callCount).to.equal(times);
-      });
+        expect(fakeComponent.getDataUrl).to.have.been.calledWith(
+            fakeComponent.props);
 
-      it('should stop polling when unmounting', function() {
-        $.ajax.reset();
-
-        fakeComponent.componentWillUnmount();
-
-        var times = _.random(2, 5);
-
-        clock.tick(fakeComponent.props.pollInterval * times);
-
-        expect($.ajax).to.not.have.been.called;
-      });
-
-      it('should stop polling when receiving pollInterval=0', function() {
-        $.ajax.reset();
-
-        var times = _.random(2, 5),
-            oldInterval = fakeComponent.props.pollInterval;
-
-        fakeComponent.componentWillReceiveProps(
-            _.merge({}, fakeComponent.props, {pollInterval: 0}));
-
-        clock.tick(oldInterval * times);
-
-        expect($.ajax).to.not.have.been.called;
-      });
-
-      it('should stop polling when told to do so', function() {
-        $.ajax.reset();
-
-        fakeComponent.stopPolling();
-
-        clock.tick(fakeComponent.props.pollInterval);
-
-        expect($.ajax).to.not.have.been.called;
-      });
-
-      it('should start polling when told to resume', function() {
-        $.ajax.reset();
-        fakeComponent.stopPolling();
-        fakeComponent.resumePolling();
-
-        var times = _.random(2, 5);
-
-        clock.tick(fakeComponent.props.pollInterval * times);
-
-        expect($.ajax.callCount).to.equal(times);
-      });
-    });
-
-    describe('when poll interval is not given', function() {
-      beforeEach(function() {
-        fakeComponent.props.pollInterval = 0;
-
-        fakeComponent.componentWillMount();
-      });
-
-      it('should not start polling after mounting', function() {
-        $.ajax.reset();
-
-        var times = _.random(2, 5);
-
-        clock.tick(fakeComponent.props.pollInterval * times);
-
-        expect($.ajax).to.not.have.been.called;
-      });
-
-      it('should start polling when receiving a poll interval', function() {
-        $.ajax.reset();
-
-        var times = _.random(2, 5),
-            interval = _.random(1000, 5000);
-
-        fakeComponent.componentWillReceiveProps(
-            _.merge({}, fakeComponent.props, {pollInterval: interval}));
-
-        clock.tick(interval * times);
-
-        expect($.ajax.callCount).to.equal(times);
+        expect($.ajax).to.have.always.been.calledWith(
+            sinon.match.has('url', 'foobar.json'));
       });
     });
   });
