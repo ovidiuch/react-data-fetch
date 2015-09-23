@@ -331,6 +331,22 @@ describe('DataFetch mixin', function() {
           expect($.ajax).to.not.have.been.called;
         });
 
+        it('should restart polling when receiving a new poll interval',
+           function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5),
+              oldInterval = fakeComponent.props.pollInterval,
+              newInterval = oldInterval * 2;
+
+          fakeComponent.componentWillReceiveProps(
+              _.merge({}, fakeComponent.props, {pollInterval: newInterval}));
+
+          clock.tick(newInterval * times);
+
+          expect($.ajax.callCount).to.equal(times);
+        });
+
         it('should stop polling when told to do so', function() {
           $.ajax.reset();
 

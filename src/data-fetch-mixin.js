@@ -57,6 +57,7 @@ module.exports = {
 
     if (this.props.pollInterval !== nextProps.pollInterval) {
       if (this._shouldWePoll(nextProps)) {
+        this._clearPolling();
         this._startPolling(nextProps);
       } else {
         this._clearPolling();
