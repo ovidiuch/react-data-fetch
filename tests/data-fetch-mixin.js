@@ -275,24 +275,9 @@ describe('DataFetch mixin', function() {
       clock.restore();
     });
 
-    it('should mark that we\'re polling when poll interval is given',
-       function() {
-      fakeComponent.props.pollInterval = 1;
-
-      expect(fakeComponent.getInitialState().isPolling).to.be.true;
-    });
-
-    it('should mark that we\'re not polling when poll interval is not given',
-       function() {
-      fakeComponent.props.pollInterval = 0;
-
-      expect(fakeComponent.getInitialState().isPolling).to.be.false;
-    });
-
     describe('when poll interval is given', function() {
       beforeEach(function() {
         fakeComponent.props.pollInterval = _.random(1000, 5000);
-        fakeComponent.state.isPolling = true;
 
         fakeComponent.componentWillMount();
       });
@@ -324,12 +309,6 @@ describe('DataFetch mixin', function() {
           fakeComponent.stopPolling();
         });
 
-        it('should mark polling as stopped when told to stop', function() {
-          expect(fakeComponent.setState).to.have.been.calledWith({
-            isPolling: false
-          });
-        });
-
         it('should clear the timer when told to stop polling', function() {
           $.ajax.reset();
 
@@ -341,12 +320,6 @@ describe('DataFetch mixin', function() {
         describe('resuming', function() {
           beforeEach(function() {
             fakeComponent.resumePolling();
-          });
-
-          it('should mark polling as started when told to resume', function() {
-            expect(fakeComponent.setState).to.have.been.calledWith({
-              isPolling: true
-            });
           });
 
           it('should start the timer when resuming polling', function() {
@@ -365,7 +338,6 @@ describe('DataFetch mixin', function() {
     describe('when poll interval is not given', function() {
       beforeEach(function() {
         fakeComponent.props.pollInterval = 0;
-        fakeComponent.state.isPolling = false;
 
         fakeComponent.componentWillMount();
       });

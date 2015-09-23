@@ -30,8 +30,7 @@ module.exports = {
   getInitialState: function() {
     return {
       isFetchingData: false,
-      dataError: null,
-      isPolling: this._shouldWePoll(this.props)
+      dataError: null
     };
   },
 
@@ -80,10 +79,6 @@ module.exports = {
 
   stopPolling: function() {
     this._clearPolling();
-
-    this.setState({
-      isPolling: false
-    });
   },
 
   resumePolling: function() {
@@ -138,10 +133,6 @@ module.exports = {
     };
 
     this._pollInterval = setInterval(callback.bind(this), props.pollInterval);
-
-    this.setState({
-      isPolling: true
-    });
   },
 
   _clearPolling: function() {
