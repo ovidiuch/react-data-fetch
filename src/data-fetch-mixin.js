@@ -49,14 +49,18 @@ module.exports = {
   componentWillReceiveProps: function(nextProps) {
     /**
      * A component can have its configuration replaced at any time so we need
-     * to fetch data again. We may also need to resume/stop polling.
+     * to fetch data again. We may also need to reset/stop polling.
      */
-    if (this.props.dataUrl !== nextProps.dataUrl) {
-      this._resetData(nextProps);
-    }
+    var dataUrlChanged = this.props.dataUrl !== nextProps.dataUrl,
+        pollIntervalChanged = this.props.pollInterval !==
+            nextProps.pollInterval;
 
-    if (this.props.pollInterval !== nextProps.pollInterval) {
+    if (dataUrlChanged || pollIntervalChanged) {
       this._clearPolling();
+
+      if (dataUrlChanged) {
+        this._resetData(nextProps);
+      }
 
       if (this._shouldWePoll(nextProps)) {
         this._startPolling(nextProps);
