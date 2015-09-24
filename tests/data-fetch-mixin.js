@@ -382,6 +382,23 @@ describe('DataFetch mixin', function() {
 
           expect($.ajax).to.have.callCount(times);
         });
+
+        it('should poll the new URL when receiving one', function() {
+          $.ajax.reset();
+
+          var times = _.random(2, 5),
+              interval = _.random(1000, 5000),
+              oldUrl = fakeComponent.props.dataUrl,
+              newUrl = oldUrl + 'new';
+
+          fakeComponent.componentWillReceiveProps(
+              _.merge({}, fakeComponent.props, {dataUrl: newUrl}));
+
+          clock.tick(interval * times);
+
+          expect($.ajax).to.have.always.been.calledWith(
+              sinon.match.has('url', newUrl));
+        });
       });
 
       describe('when poll interval is not given', function() {
