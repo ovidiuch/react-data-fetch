@@ -40,17 +40,27 @@ module.exports = {
     // The dataUrl prop points to a source of data than will extend the initial
     // state of the component, once it will be fetched
     this._resetData(this.props);
+
+    if (this._shouldWePoll(this.props)) {
+      this._startPolling(this.props);
+    }
   },
 
   componentWillReceiveProps: function(nextProps) {
     /**
      * A component can have its configuration replaced at any time so we need
-     * to fetch data again.
-     *
-     * Only fetch data if the dataUrl has changed.
+     * to fetch data again. We may also need to resume/stop polling.
      */
     if (this.props.dataUrl !== nextProps.dataUrl) {
       this._resetData(nextProps);
+    }
+
+    if (this.props.pollInterval !== nextProps.pollInterval) {
+      this._clearPolling();
+
+      if (this._shouldWePoll(nextProps)) {
+        this._startPolling(nextProps);
+      }
     }
   },
 
@@ -62,6 +72,8 @@ module.exports = {
     this._ignoreXhrRequestCallbacks = true;
 
     this._clearDataRequests();
+
+    this._clearPolling();
   },
 
   refreshData: function() {
@@ -75,6 +87,15 @@ module.exports = {
     this._clearDataRequests();
   },
 
+  stopPolling: function() {
+    this._clearPolling();
+  },
+
+  resumePolling: function() {
+    this._clearPolling();
+    this._startPolling(this.props);
+  },
+
   receiveDataFromServer: function(data) {
     this.setState({
       isFetchingData: false,
@@ -86,8 +107,7 @@ module.exports = {
     /**
      * Hit the dataUrl and fetch data.
      *
-     * Before starting to fetch data we reset any ongoing requests. We also
-     * reset the polling interval.
+     * Before starting to fetch data we reset any ongoing requests.
      *
      * @param {Object} props
      * @param {String} props.dataUrl The URL that will be hit for data. The URL
@@ -96,38 +116,40 @@ module.exports = {
      *     returns the data URL. The expected method name is "getDataUrl" and
      *     overrides the dataUrl prop when implemented
      */
-    var dataUrl = typeof(this.getDataUrl) === 'function' ?
-                  this.getDataUrl(props) :
-                  props.dataUrl;
+    var dataUrl = this._getDataUrl(props);
 
-    // Clear any on-going polling when data is reset. Even if polling is still
-    // enabled, we need to reset the interval to start from now
     this._clearDataRequests();
 
     if (dataUrl) {
       this._fetchDataFromServer(dataUrl, this.receiveDataFromServer);
-
-      if (props.pollInterval) {
-        var callback = function() {
-          this._fetchDataFromServer(dataUrl, this.receiveDataFromServer);
-        };
-
-        this._pollInterval = setInterval(callback.bind(this),
-                                         props.pollInterval);
-      }
     }
   },
 
   _clearDataRequests: function() {
-    // Cancel any on-going request and future polling
+    // Cancel any on-going request.
     while (!_.isEmpty(this._xhrRequests)) {
       this._xhrRequests.pop().abort();
     }
+  },
 
-    if (this._pollInterval) {
-      clearInterval(this._pollInterval);
-      this._pollInterval = null;
-    }
+  _startPolling: function(props) {
+    var url = this._getDataUrl(props);
+
+    var callback = function() {
+      this._fetchDataFromServer(url, this.receiveDataFromServer);
+    };
+
+    this._pollInterval = setInterval(callback.bind(this), props.pollInterval);
+  },
+
+  _clearPolling: function() {
+    clearInterval(this._pollInterval);
+    this._pollInterval = null;
+  },
+
+  _getDataUrl: function(props) {
+    return typeof(this.getDataUrl) === 'function' ?
+        this.getDataUrl(props) : props.dataUrl;
   },
 
   _fetchDataFromServer: function(url, onSuccess) {
@@ -172,5 +194,9 @@ module.exports = {
     });
 
     this._xhrRequests.push(request);
+  },
+
+  _shouldWePoll: function(props) {
+    return props.pollInterval > 0;
   }
 };
