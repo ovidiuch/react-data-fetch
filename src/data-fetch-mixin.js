@@ -56,11 +56,10 @@ module.exports = {
     }
 
     if (this.props.pollInterval !== nextProps.pollInterval) {
+      this._clearPolling();
+
       if (this._shouldWePoll(nextProps)) {
-        this._clearPolling();
         this._startPolling(nextProps);
-      } else {
-        this._clearPolling();
       }
     }
   },
