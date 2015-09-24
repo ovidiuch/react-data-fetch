@@ -368,6 +368,20 @@ describe('DataFetch mixin', function() {
 
           expect($.ajax).to.have.callCount(times);
         });
+
+        it('should only poll once if told to resume multiple times',
+           function() {
+          $.ajax.reset();
+          fakeComponent.stopPolling();
+
+          _.times(_.random(2, 5), fakeComponent.resumePolling, fakeComponent);
+
+          var times = _.random(2, 5);
+
+          clock.tick(fakeComponent.props.pollInterval * times);
+
+          expect($.ajax).to.have.callCount(times);
+        });
       });
 
       describe('when poll interval is not given', function() {

@@ -92,6 +92,7 @@ module.exports = {
   },
 
   resumePolling: function() {
+    this._clearPolling();
     this._startPolling(this.props);
   },
 
