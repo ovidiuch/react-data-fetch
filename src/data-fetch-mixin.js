@@ -191,8 +191,8 @@ module.exports = function() {
 
       request = $.ajax({
         url: url,
-        // Even though not recommended, some $.ajaxSettings might default to POST
-        // requests. See http://api.jquery.com/jquery.ajaxsetup/
+        // Even though not recommended, some $.ajaxSettings might default to
+        // POST requests. See http://api.jquery.com/jquery.ajaxsetup/
         type: 'GET',
         dataType: 'json',
         complete: onComplete.bind(this),
