@@ -15,7 +15,7 @@ describe('DataFetch mixin', function() {
     // doesn't detect a DOM
     $.ajax = sinon.stub().returns(ajaxStub);
 
-    fakeComponent = _.clone(DataFetch);
+    fakeComponent = _.clone(DataFetch());
 
     // Mock React API
     fakeComponent.setState = sinon.spy();
