@@ -19,9 +19,19 @@ var _ = require('lodash'),
  */
 
 /**
+ * @param {Object} [options]
+ * @param {Bool} [options.crossDomain=false] If `true`, the requests will
+ *     contain the cookies set for the other domain.
+ *
  * @returns {DataFetchMixin}
  */
-module.exports = function() {
+module.exports = function(options) {
+  options = options || {};
+
+  _.defaults(options, {
+    crossDomain: false
+  });
+
   return {
     getDefaultProps: function() {
       return {
@@ -195,6 +205,9 @@ module.exports = function() {
         // POST requests. See http://api.jquery.com/jquery.ajaxsetup/
         type: 'GET',
         dataType: 'json',
+        xhrFields: {
+          withCredentials: options.crossDomain
+        },
         complete: onComplete.bind(this),
         success: onSuccess,
         error: onError.bind(this)
