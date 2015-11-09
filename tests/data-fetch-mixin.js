@@ -488,4 +488,31 @@ describe('DataFetch mixin', function() {
                           sinon.match.has('withCredentials', true)));
     });
   });
+
+  describe('error callback', function() {
+    var errorCallback;
+
+    beforeEach(function() {
+      errorCallback = sinon.spy();
+
+      _.assign(fakeComponent, DataFetch({onError: errorCallback}));
+    });
+
+    it('should call the error callback when a request errors', function() {
+      fakeComponent.props.dataUrl = 'my-api.json';
+
+      fakeComponent.componentWillMount();
+
+      var onError = $.ajax.args[0][0].error;
+
+      var xhrObject = {foo: 'bar'},
+          statusCode = 42,
+          errMessage = 'foobared';
+
+      onError(xhrObject, statusCode, errMessage);
+
+      expect(errorCallback).to.have.been.calledWith(
+          xhrObject, statusCode, errMessage);
+    });
+  });
 });

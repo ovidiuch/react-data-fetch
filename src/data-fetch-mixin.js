@@ -22,6 +22,9 @@ var _ = require('lodash'),
  * @param {Object} [options]
  * @param {Bool} [options.crossDomain=false] If `true`, the requests will
  *     contain the cookies set for the other domain.
+ * @param {Function} [onError] If given, it will be called whenever a request
+ *     fails. See http://devdocs.io/jquery/jquery.ajax for details on what
+ *     params will be passed.
  *
  * @returns {DataFetchMixin}
  */
@@ -29,7 +32,8 @@ module.exports = function(options) {
   options = options || {};
 
   _.defaults(options, {
-    crossDomain: false
+    crossDomain: false,
+    onError: function() {}
   });
 
   return {
@@ -197,6 +201,8 @@ module.exports = function(options) {
             message: err.toString()
           }
         });
+
+        options.onError.apply(this, arguments);
       };
 
       request = $.ajax({
