@@ -1,6 +1,6 @@
 {
   "name": "react-data-fetch",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A good-enough data fetching mixin for React components",
   "repository": {
     "type": "git",
