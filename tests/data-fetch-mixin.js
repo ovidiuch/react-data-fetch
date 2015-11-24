@@ -193,7 +193,8 @@ describe('DataFetch mixin', function() {
           err = {toString: sinon.stub()},
           xhrObj = {
             status: 404,
-            statusText: 'Not found'
+            statusText: 'Not found',
+            responseText: '{"foo": "bar"}'
           };
 
       beforeEach(function() {
@@ -225,6 +226,10 @@ describe('DataFetch mixin', function() {
 
       it('should save the message of a failed request', function() {
         expect(err.toString.callCount).to.equal(1);
+      });
+
+      it('should save the response of a failed request', function() {
+        expect(setStateArgs.response).to.equal(xhrObj.responseJSON);
       });
     });
 
