@@ -198,7 +198,8 @@ module.exports = function(options) {
             url: url,
             statusCode: xhr.status,
             statusText: status,
-            message: err.toString()
+            message: err.toString(),
+            response: xhr.responseJSON
           }
         });
 
