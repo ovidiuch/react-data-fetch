@@ -213,7 +213,7 @@ module.exports = function(options) {
           }
         });
 
-        options.onError.call(this, this, xhr, status, err);
+        options.onError(this, xhr, status, err);
       };
 
       request = $.ajax({
