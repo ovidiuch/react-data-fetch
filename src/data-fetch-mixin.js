@@ -24,7 +24,8 @@ var _ = require('lodash'),
  *     contain the cookies set for the other domain.
  * @param {Function} [onError] If given, it will be called whenever a request
  *     fails. See http://devdocs.io/jquery/jquery.ajax for details on what
- *     params will be passed.
+ *     params will be passed. The only difference is that the context will be
+ *     passed as the first param instead of being set to `this`.
  *
  * @returns {DataFetchMixin}
  */
@@ -187,12 +188,21 @@ module.exports = function(options) {
         this._xhrRequests = _.without(this._xhrRequests, request);
       };
 
+      var instance = this;
+
+      /**
+       * @this {Object} $.ajax context.
+       *
+       * @param {Object} xhr jQuery XHR object.
+       * @param {String} status The type of error.
+       * @param {String} err The error message.
+       */
       onError = function(xhr, status, err) {
-        if (this._ignoreXhrRequestCallbacks) {
+        if (instance._ignoreXhrRequestCallbacks) {
           return;
         }
 
-        this.setState({
+        instance.setState({
           isFetchingData: false,
           dataError: {
             url: url,
@@ -203,7 +213,7 @@ module.exports = function(options) {
           }
         });
 
-        options.onError.apply(this, arguments);
+        options.onError.call(this, this, xhr, status, err);
       };
 
       request = $.ajax({
@@ -217,7 +227,7 @@ module.exports = function(options) {
         },
         complete: onComplete.bind(this),
         success: onSuccess,
-        error: onError.bind(this)
+        error: onError
       });
 
       this._xhrRequests.push(request);

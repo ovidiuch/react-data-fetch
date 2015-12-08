@@ -514,10 +514,10 @@ describe('DataFetch mixin', function() {
           statusCode = 42,
           errMessage = 'foobared';
 
-      onError(xhrObject, statusCode, errMessage);
+      onError.call({url: 'my-api.json'}, xhrObject, statusCode, errMessage);
 
       expect(errorCallback).to.have.been.calledWith(
-          xhrObject, statusCode, errMessage);
+          {url: 'my-api.json'}, xhrObject, statusCode, errMessage);
     });
   });
 });
