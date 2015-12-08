@@ -495,29 +495,31 @@ describe('DataFetch mixin', function() {
   });
 
   describe('error callback', function() {
-    var errorCallback;
+    var errorCallback, context;
 
     beforeEach(function() {
       errorCallback = sinon.spy();
 
       _.assign(fakeComponent, DataFetch({onError: errorCallback}));
-    });
 
-    it('should call the error callback when a request errors', function() {
       fakeComponent.props.dataUrl = 'my-api.json';
 
       fakeComponent.componentWillMount();
 
-      var onError = $.ajax.args[0][0].error;
+      context = {url: 'my-api.json'};
 
-      var xhrObject = {foo: 'bar'},
-          statusCode = 42,
-          errMessage = 'foobared';
+      $.ajax.args[0][0].error.call(
+          context, {foo: 'bar'}, 42, 'foobared');
 
-      onError(xhrObject, statusCode, errMessage);
+    });
 
+    it('should call the error callback when a request errors', function() {
       expect(errorCallback).to.have.been.calledWith(
-          xhrObject, statusCode, errMessage);
+          {foo: 'bar'}, 42, 'foobared');
+    });
+
+    it('should call the error callback with the right context', function() {
+      expect(errorCallback).to.have.been.calledOn(context);
     });
   });
 });

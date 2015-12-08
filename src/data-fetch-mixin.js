@@ -187,12 +187,21 @@ module.exports = function(options) {
         this._xhrRequests = _.without(this._xhrRequests, request);
       };
 
+      var instance = this;
+
+      /**
+       * @this {Object} $.ajax context.
+       *
+       * @param {Object} xhr jQuery XHR object.
+       * @param {String} status The type of error.
+       * @param {String} err The error message.
+       */
       onError = function(xhr, status, err) {
-        if (this._ignoreXhrRequestCallbacks) {
+        if (instance._ignoreXhrRequestCallbacks) {
           return;
         }
 
-        this.setState({
+        instance.setState({
           isFetchingData: false,
           dataError: {
             url: url,
@@ -203,7 +212,7 @@ module.exports = function(options) {
           }
         });
 
-        options.onError.apply(this, arguments);
+        options.onError.call(this, xhr, status, err);
       };
 
       request = $.ajax({
@@ -217,7 +226,7 @@ module.exports = function(options) {
         },
         complete: onComplete.bind(this),
         success: onSuccess,
-        error: onError.bind(this)
+        error: onError
       });
 
       this._xhrRequests.push(request);
