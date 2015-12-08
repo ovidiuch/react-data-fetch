@@ -24,8 +24,7 @@ var _ = require('lodash'),
  *     contain the cookies set for the other domain.
  * @param {Function} [onError] If given, it will be called whenever a request
  *     fails. See http://devdocs.io/jquery/jquery.ajax for details on what
- *     params will be passed. The only difference is that the context will be
- *     passed as the first param instead of being set to `this`.
+ *     params will be passed.
  *
  * @returns {DataFetchMixin}
  */
@@ -213,7 +212,7 @@ module.exports = function(options) {
           }
         });
 
-        options.onError(this, xhr, status, err);
+        options.onError.call(this, xhr, status, err);
       };
 
       request = $.ajax({
