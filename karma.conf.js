@@ -9,7 +9,7 @@ module.exports = function(config) {
     files: [
       '**/*.js'
     ],
-    frameworks: ['mocha', 'chai', 'sinon-chai'],
+    frameworks: ['mocha', 'chai', 'sinon-chai', 'es6-shim'],
     preprocessors: {
       '**/*.js': ['webpack']
     },
