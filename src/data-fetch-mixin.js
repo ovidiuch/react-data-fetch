@@ -1,4 +1,5 @@
-var _ = require('lodash'),
+var defaults = require('lodash.defaults'),
+    without = require('lodash.without'),
     $ = require('jquery');
 
 /**
@@ -31,7 +32,7 @@ var _ = require('lodash'),
 module.exports = function(options) {
   options = options || {};
 
-  _.defaults(options, {
+  defaults(options, {
     crossDomain: false,
     onError: function() {}
   });
@@ -148,7 +149,7 @@ module.exports = function(options) {
 
     _clearDataRequests: function() {
       // Cancel any on-going request.
-      while (!_.isEmpty(this._xhrRequests)) {
+      while (this._xhrRequests.length > 0) {
         this._xhrRequests.pop().abort();
       }
     },
@@ -184,7 +185,7 @@ module.exports = function(options) {
           onError;
 
       onComplete = function() {
-        this._xhrRequests = _.without(this._xhrRequests, request);
+        this._xhrRequests = without(this._xhrRequests, request);
       };
 
       var instance = this;
