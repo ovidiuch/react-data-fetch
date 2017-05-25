@@ -184,7 +184,7 @@ module.exports = function(options) {
           onError;
 
       onComplete = function() {
-        this._xhrRequests = this._xhrRequests.filter(function (xhrRequest) {
+        this._xhrRequests = this._xhrRequests.filter(function(xhrRequest) {
           return xhrRequest !== request;
         });
       };
