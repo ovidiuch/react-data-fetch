@@ -181,6 +181,20 @@ describe('DataFetch mixin', function() {
       expect(initialState.isFetchingData).to.equal(false);
     });
 
+    it('should not try to abort completed requests', function() {
+      ajaxStub.abort = sinon.spy();
+      fakeComponent.props.dataUrl = 'my-api.json';
+
+      fakeComponent.componentWillMount();
+
+      var onComplete = $.ajax.args[0][0].complete;
+      onComplete();
+
+      fakeComponent.componentWillUnmount();
+
+      expect(ajaxStub.abort).to.not.have.been.called;
+    });
+
     it('should set dataError to null in initial state', function() {
       var initialState = fakeComponent.getInitialState();
 
