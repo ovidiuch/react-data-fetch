@@ -1,5 +1,4 @@
 var defaults = require('lodash.defaults'),
-    without = require('lodash.without'),
     $ = require('jquery');
 
 /**
@@ -185,7 +184,9 @@ module.exports = function(options) {
           onError;
 
       onComplete = function() {
-        this._xhrRequests = without(this._xhrRequests, request);
+        this._xhrRequests = this._xhrRequests.filter(function (xhrRequest) {
+          return xhrRequest !== request;
+        });
       };
 
       var instance = this;
