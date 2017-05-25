@@ -1,4 +1,4 @@
-var _ = require('lodash'),
+var random = require('lodash.random'),
     $ = require('jquery'),
     DataFetch = require('../src/data-fetch-mixin.js');
 
@@ -23,7 +23,7 @@ describe('DataFetch mixin', function() {
 
   describe('same domain', function() {
     beforeEach(function() {
-      _.assign(fakeComponent, DataFetch());
+      Object.assign(fakeComponent, DataFetch());
     });
 
     it('should call $.ajax with dataUrl prop on mount', function() {
@@ -181,6 +181,20 @@ describe('DataFetch mixin', function() {
       expect(initialState.isFetchingData).to.equal(false);
     });
 
+    it('should not try to abort completed requests', function() {
+      ajaxStub.abort = sinon.spy();
+      fakeComponent.props.dataUrl = 'my-api.json';
+
+      fakeComponent.componentWillMount();
+
+      var onComplete = $.ajax.args[0][0].complete;
+      onComplete();
+
+      fakeComponent.componentWillUnmount();
+
+      expect(ajaxStub.abort).to.not.have.been.called;
+    });
+
     it('should set dataError to null in initial state', function() {
       var initialState = fakeComponent.getInitialState();
 
@@ -298,7 +312,7 @@ describe('DataFetch mixin', function() {
 
         describe('when poll interval is given', function() {
           beforeEach(function() {
-            fakeComponent.props.pollInterval = _.random(1000, 5000);
+            fakeComponent.props.pollInterval = random(1000, 5000);
 
             fakeComponent.componentWillMount();
           });
@@ -306,7 +320,7 @@ describe('DataFetch mixin', function() {
           it('should start polling after mounting', function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5);
+            var times = random(2, 5);
 
             clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -316,7 +330,7 @@ describe('DataFetch mixin', function() {
           it('should poll the right URL', function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5);
+            var times = random(2, 5);
 
             clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -329,7 +343,7 @@ describe('DataFetch mixin', function() {
 
             fakeComponent.componentWillUnmount();
 
-            var times = _.random(2, 5);
+            var times = random(2, 5);
 
             clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -339,11 +353,11 @@ describe('DataFetch mixin', function() {
           it('should stop polling when receiving pollInterval=0', function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5),
+            var times = random(2, 5),
                 oldInterval = fakeComponent.props.pollInterval;
 
             fakeComponent.componentWillReceiveProps(
-                _.merge({}, fakeComponent.props, {pollInterval: 0}));
+                Object.assign({}, fakeComponent.props, {pollInterval: 0}));
 
             clock.tick(oldInterval * times);
 
@@ -354,12 +368,14 @@ describe('DataFetch mixin', function() {
              function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5),
+            var times = random(2, 5),
                 oldInterval = fakeComponent.props.pollInterval,
                 newInterval = oldInterval * 2;
 
             fakeComponent.componentWillReceiveProps(
-                _.merge({}, fakeComponent.props, {pollInterval: newInterval}));
+                Object.assign({}, fakeComponent.props, {
+                  pollInterval: newInterval
+                }));
 
             clock.tick(newInterval * times);
 
@@ -381,7 +397,7 @@ describe('DataFetch mixin', function() {
             fakeComponent.stopPolling();
             fakeComponent.resumePolling();
 
-            var times = _.random(2, 5);
+            var times = random(2, 5);
 
             clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -393,9 +409,11 @@ describe('DataFetch mixin', function() {
             $.ajax.reset();
             fakeComponent.stopPolling();
 
-            _.times(_.random(2, 5), fakeComponent.resumePolling, fakeComponent);
+            for (var i = 0, n = random(2, 5); i < n; i++) {
+              fakeComponent.resumePolling();
+            }
 
-            var times = _.random(2, 5);
+            var times = random(2, 5);
 
             clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -405,13 +423,13 @@ describe('DataFetch mixin', function() {
           it('should poll the new URL when receiving one', function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5),
-                interval = _.random(1000, 5000),
+            var times = random(2, 5),
+                interval = random(1000, 5000),
                 oldUrl = fakeComponent.props.dataUrl,
                 newUrl = oldUrl + 'new';
 
             fakeComponent.componentWillReceiveProps(
-                _.merge({}, fakeComponent.props, {dataUrl: newUrl}));
+                Object.assign({}, fakeComponent.props, {dataUrl: newUrl}));
 
             clock.tick(interval * times);
 
@@ -430,7 +448,7 @@ describe('DataFetch mixin', function() {
           it('should not start polling after mounting', function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5);
+            var times = random(2, 5);
 
             clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -440,11 +458,13 @@ describe('DataFetch mixin', function() {
           it('should start polling when receiving a poll interval', function() {
             $.ajax.reset();
 
-            var times = _.random(2, 5),
-                interval = _.random(1000, 5000);
+            var times = random(2, 5),
+                interval = random(1000, 5000);
 
             fakeComponent.componentWillReceiveProps(
-                _.merge({}, fakeComponent.props, {pollInterval: interval}));
+                Object.assign({}, fakeComponent.props, {
+                  pollInterval: interval
+                }));
 
             clock.tick(interval * times);
 
@@ -456,7 +476,7 @@ describe('DataFetch mixin', function() {
       describe('with custom dataUrl', function() {
         beforeEach(function() {
           fakeComponent.getDataUrl = sinon.stub().returns('foobar.json');
-          fakeComponent.props.pollInterval = _.random(1000, 5000);
+          fakeComponent.props.pollInterval = random(1000, 5000);
 
           fakeComponent.componentWillMount();
         });
@@ -464,7 +484,7 @@ describe('DataFetch mixin', function() {
         it('should poll the right URL', function() {
           $.ajax.reset();
 
-          var times = _.random(2, 5);
+          var times = random(2, 5);
 
           clock.tick(fakeComponent.props.pollInterval * times);
 
@@ -480,7 +500,7 @@ describe('DataFetch mixin', function() {
 
   describe('cross domain', function() {
     beforeEach(function() {
-      _.assign(fakeComponent, DataFetch({crossDomain: true}));
+      Object.assign(fakeComponent, DataFetch({crossDomain: true}));
     });
 
     it('should send cross-domain cookies', function() {
@@ -500,7 +520,7 @@ describe('DataFetch mixin', function() {
     beforeEach(function() {
       errorCallback = sinon.spy();
 
-      _.assign(fakeComponent, DataFetch({onError: errorCallback}));
+      Object.assign(fakeComponent, DataFetch({onError: errorCallback}));
 
       fakeComponent.props.dataUrl = 'my-api.json';
 

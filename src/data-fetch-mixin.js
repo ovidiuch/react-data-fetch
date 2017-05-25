@@ -1,5 +1,4 @@
-var _ = require('lodash'),
-    $ = require('jquery');
+var $ = require('jquery');
 
 /**
  * Bare functionality for fetching server-side JSON data inside a React
@@ -31,10 +30,10 @@ var _ = require('lodash'),
 module.exports = function(options) {
   options = options || {};
 
-  _.defaults(options, {
+  options = $.extend({
     crossDomain: false,
     onError: function() {}
-  });
+  }, options);
 
   return {
     getDefaultProps: function() {
@@ -148,7 +147,7 @@ module.exports = function(options) {
 
     _clearDataRequests: function() {
       // Cancel any on-going request.
-      while (!_.isEmpty(this._xhrRequests)) {
+      while (this._xhrRequests.length > 0) {
         this._xhrRequests.pop().abort();
       }
     },
@@ -184,7 +183,9 @@ module.exports = function(options) {
           onError;
 
       onComplete = function() {
-        this._xhrRequests = _.without(this._xhrRequests, request);
+        this._xhrRequests = this._xhrRequests.filter(function(xhrRequest) {
+          return xhrRequest !== request;
+        });
       };
 
       var instance = this;
