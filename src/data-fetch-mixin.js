@@ -1,5 +1,4 @@
-var defaults = require('lodash.defaults'),
-    $ = require('jquery');
+var $ = require('jquery');
 
 /**
  * Bare functionality for fetching server-side JSON data inside a React
@@ -31,10 +30,10 @@ var defaults = require('lodash.defaults'),
 module.exports = function(options) {
   options = options || {};
 
-  defaults(options, {
+  options = $.extend({
     crossDomain: false,
     onError: function() {}
-  });
+  }, options);
 
   return {
     getDefaultProps: function() {
